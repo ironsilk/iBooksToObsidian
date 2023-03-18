@@ -10,7 +10,7 @@ import pwd
 
 pd.set_option('display.max_columns', None)
 
-OBSIDIAN_PATH = "/Users/mike/Library/Mobile Documents/iCloud~md~obsidian/Documents/ObsiVault"
+OBSIDIAN_PATH = "/Users/mike/Library/Mobile Documents/iCloud~md~obsidian/Documents/ObsiVault/Books"
 
 
 def get_username():
@@ -123,19 +123,23 @@ def dump_files(markdowns):
 
 
 def run():
+    if not os.path.isdir(f"{OBSIDIAN_PATH}"):
+        os.mkdir(f"{OBSIDIAN_PATH}")
+    markdowns = []
     db = get_db()
     collections = db.groupby('collection_name')
     for collection_name, collection in collections:
         if not os.path.isdir(f"{OBSIDIAN_PATH}/{collection_name}") and len(collection) > 0:
             os.mkdir(f"{OBSIDIAN_PATH}/{collection_name}")
         books = collection.groupby('book_title')
-        markdowns = []
         for title, entries in books:
             entries = entries.sort_values(by='timestamp')
             markdown = generate_book_entry(title, entries['book_author'].iloc[0], entries)
             markdowns.append(([f"{OBSIDIAN_PATH}/{collection_name}/{title}.md", markdown]))
 
     dump_files(markdowns)
+    db['sync_status'] = 'synced'
+    db.to_csv(f"{OBSIDIAN_PATH}/annotation_db.csv")
 
 
 run()
