@@ -74,6 +74,7 @@ def get_collections(path):
                                              'PDFs',
                                              'Books',
                                              'Want to Read',
+                                             'All',
                                              'My Samples',
                                              'Library',
                                              'Audiobooks',
